@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 public class SerialSort {
     public static final String filename = "random.txt";
+
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis(); //program start
         FileLoader fileLoader = new FileLoader();
@@ -21,7 +22,7 @@ public class SerialSort {
         long quickSortEndTime   = System.currentTimeMillis(); //quickSort over
         System.out.println("QuickSort spend : "+ (quickSortEndTime - quickSortStartTime)+"ms");
         long countingSortStartTime   = System.currentTimeMillis();
-        sortSolution.CountingSort(countingSortData);
+        sortSolution.CountingSort(countingSortData,0,countingSortData.length-1);
 //        System.out.println(Arrays.toString(countingSortData));
         long countingSortEndTime   = System.currentTimeMillis(); //quickSort over
         System.out.println("CountSort spend : "+ (countingSortEndTime - countingSortStartTime)+"ms");
@@ -30,15 +31,34 @@ public class SerialSort {
 //        System.out.println(Arrays.toString(mergeSortData));
         long mergeSortEndTime   = System.currentTimeMillis(); //quickSort over
         System.out.println("MergeSort spend : "+ (mergeSortEndTime - mergeSortStartTime)+"ms");
-
-
 //        System.out.println(Arrays.toString(dataToSort));
+        //verify sort correct!
+        sortSolution.verify(quickSortData);
+        sortSolution.verify(countingSortData);
+        sortSolution.verify(mergeSortData);
+
     }
 }
 
 class FileLoader {
     FileLoader(){super();}
     public int[] readFile(String filename) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+//                System.out.println(line);
+                if(line.trim().length() ==0 ){
+                    return new int[0];
+                }
+                return getIntArrayFromStringArray(line.split(" "));
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return new int[0];
+    }
+
+    public int[] writeFile(String filename, int[] sortedOrder) {
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
             String line;
             while ((line = br.readLine()) != null) {
@@ -67,15 +87,25 @@ class FileLoader {
 }
 
 class SortSolution {
+    public static void verify(int[] nums) {
+        for(int i=0;i<nums.length-1;i++){
+            if(nums[i]>nums[i+1]){
+                System.out.println("sort failed");
+                return;
+            }
+
+        }
+        System.out.println("sort successful");
+    }
     SortSolution(){super();}
-    void QuickSort(int[] nums,int low,int high,int n){
+    public static void  QuickSort(int[] nums,int low,int high,int n){
         if(low<high) {
             int pivotpos = partition(nums,low,high);
             QuickSort(nums,low,pivotpos-1,n);
             QuickSort(nums,pivotpos+1,high,n);
         }
     }
-    int partition(int[] nums,int low,int high){
+    public static int partition(int[] nums,int low,int high){
         int pivot = nums[low];
         while(low<high) {
             while(low<high && nums[high]>=pivot)--high;
@@ -87,7 +117,7 @@ class SortSolution {
         return low;
     }
 
-    void mergeSortInOrder(int[] arr,int bgn,int mid, int end){
+    public static void mergeSortInOrder(int[] arr,int bgn,int mid, int end){
         int l = bgn, m = mid +1, e = end;
         int[] arrs = new int[end - bgn + 1];
         int k = 0;
@@ -108,7 +138,7 @@ class SortSolution {
             arr[i + bgn] = arrs[i];
         }
     }
-    void MergeSort(int[] arr, int bgn, int end)
+    public static void MergeSort(int[] arr, int bgn, int end)
     {
         if(bgn >= end){
             return;
@@ -121,22 +151,26 @@ class SortSolution {
 
     private static final int OFFSET = 50000;
 
-    public int[] CountingSort(int[] nums) {
-        int len = nums.length;
+    public static int[] CountingSort(int[] nums, int bgn, int end) {
+
+//        int len = nums.length;
+        int len = end+1;
         int size = 100001;
 
         int[] count = new int[size];
-        for (int num : nums) {
-            count[num + OFFSET]++;
+        for(int i = bgn; i<=end ;i++){
+//        for (int num : nums) {
+//            count[num + OFFSET]++;
+            count[nums[i] + OFFSET]++;
         }
 
         for (int i = 1; i < size; i++) {
             count[i] += count[i - 1];
         }
 
-        int[] temp = new int[len];
-        System.arraycopy(nums, 0, temp, 0, len);
-        for (int i = len - 1; i >= 0; i--) {
+        int[] temp = new int[nums.length];
+        System.arraycopy(nums, bgn, temp, bgn, end-bgn+1);
+        for (int i = len - 1; i >= bgn; i--) {
             int index = count[temp[i] + OFFSET] - 1;
             nums[index] = temp[i];
             count[temp[i] + OFFSET]--;
