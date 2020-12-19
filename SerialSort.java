@@ -36,7 +36,9 @@ public class SerialSort {
         sortSolution.verify(quickSortData);
         sortSolution.verify(countingSortData);
         sortSolution.verify(mergeSortData);
-
+        fileLoader.writeFile("order1.txt",quickSortData);
+        fileLoader.writeFile("order2.txt",countingSortData);
+        fileLoader.writeFile("order3.txt",mergeSortData);
     }
 }
 
@@ -58,20 +60,26 @@ class FileLoader {
         return new int[0];
     }
 
-    public int[] writeFile(String filename, int[] sortedOrder) {
-        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-//                System.out.println(line);
-                if(line.trim().length() ==0 ){
-                    return new int[0];
-                }
-                return getIntArrayFromStringArray(line.split(" "));
+    public void writeFile(String filename, int[] sortedOrder) {
+        try {
+            File file = new File(filename);
+            if (!file.exists()) {
+                file.createNewFile();
             }
-        }catch(Exception e){
+            StringBuilder b = new StringBuilder();
+            for (int i = 0;i<sortedOrder.length; i++) {
+                b.append(sortedOrder[i]);
+                b.append(" ");
+            }
+            String fileContent = b.toString();
+            FileWriter fw = new FileWriter(file.getAbsoluteFile());
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(fileContent);
+            bw.close();
+            System.out.println(filename + "Done");
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        return new int[0];
     }
 
     public static int[] getIntArrayFromStringArray(String[] strArray){
@@ -156,14 +164,10 @@ class SortSolution {
 //        int len = nums.length;
         int len = end+1;
         int size = 100001;
-
         int[] count = new int[size];
         for(int i = bgn; i<=end ;i++){
-//        for (int num : nums) {
-//            count[num + OFFSET]++;
             count[nums[i] + OFFSET]++;
         }
-
         for (int i = 1; i < size; i++) {
             count[i] += count[i - 1];
         }
@@ -171,7 +175,7 @@ class SortSolution {
         int[] temp = new int[nums.length];
         System.arraycopy(nums, bgn, temp, bgn, end-bgn+1);
         for (int i = len - 1; i >= bgn; i--) {
-            int index = count[temp[i] + OFFSET] - 1;
+            int index = count[temp[i] + OFFSET] - 1 + bgn;
             nums[index] = temp[i];
             count[temp[i] + OFFSET]--;
         }

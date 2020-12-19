@@ -19,27 +19,14 @@ public class ParallelSort {
         int[] quickSortData = (int[])Arrays.copyOf(dataToSort,dataToSort.length);
         int[] countingSortData = (int[])Arrays.copyOf(dataToSort,dataToSort.length);
         int[] mergeSortData = (int[])Arrays.copyOf(dataToSort,dataToSort.length);
-        duelThreadMergeSort(mergeSortData);
-        duelThreadCountingSort(countingSortData);
         duelThreadQuickSort(quickSortData);
+        duelThreadCountingSort(countingSortData);
+        duelThreadMergeSort(mergeSortData);
 
-//        long dataLoadTime   = System.currentTimeMillis(); //dataload
-//        System.out.println("dataload spend : "+ (dataLoadTime-startTime)+"ms");
-//        //QuickSort
-//        long quickSortStartTime   = System.currentTimeMillis();
-//        sortSolution.QuickSort(quickSortData,0,quickSortData.length-1,quickSortData.length);
-////        System.out.println(Arrays.toString(quickSortData));
-//        long quickSortEndTime   = System.currentTimeMillis(); //quickSort over
-//        System.out.println("QuickSort spend : "+ (quickSortEndTime - quickSortStartTime)+"ms");
-//        long countingSortStartTime   = System.currentTimeMillis();
-//        sortSolution.CountingSort(countingSortData);
-////        System.out.println(Arrays.toString(countingSortData));
-//        long countingSortEndTime   = System.currentTimeMillis(); //quickSort over
-//        System.out.println("CountSort spend : "+ (countingSortEndTime - countingSortStartTime)+"ms");
-//        ForkJoinImplementOfMergeSort(mergeSortData);
-//        sortSolution.verify(quickSortData);
-//        sortSolution.verify(countingSortData);
-//        System.out.println(Arrays.toString(dataToSort));
+        fileLoader.writeFile("order4.txt",quickSortData);
+        fileLoader.writeFile("order5.txt",countingSortData);
+        fileLoader.writeFile("order6.txt",mergeSortData);
+
 }
 
     public static void duelThreadMergeSort (int[] data) throws InterruptedException {
