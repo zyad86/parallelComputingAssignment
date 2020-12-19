@@ -1,11 +1,7 @@
-import java.io.*;
 import java.util.Arrays;
-import java.util.Random;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
-import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.TimeUnit;
 
 
@@ -28,6 +24,7 @@ public class ParallelSort {
             int[] fourMergeSortData = (int[]) Arrays.copyOf(dataToSort, dataToSort.length);
             int[] forkMergeSortData = (int[]) Arrays.copyOf(dataToSort, dataToSort.length);
             int[] fourForkMergeSortData = (int[]) Arrays.copyOf(dataToSort, dataToSort.length);
+            int[] eightMergeSortData = (int[]) Arrays.copyOf(dataToSort, dataToSort.length);
 
             double duelquick = duelThreadQuickSort(quickSortData);
             quickSortRunTime[i] = duelquick;
@@ -39,6 +36,8 @@ public class ParallelSort {
 //            quickSortRunTime[i] = forkjoin;
 //            double fourthread = fourThreadMergeSort(fourMergeSortData);
 //            coutingSortRunTime[i] = fourthread;
+//            double eightthread = eightThreadMergeSort(eightMergeSortData);
+//            quickSortRunTime[i] = eightthread;
         }
         calculateMeanAndStdOfParallel(quickSortRunTime, coutingSortRunTime, mergeSortRunTime);
 
@@ -80,8 +79,6 @@ public class ParallelSort {
 
         sortSolution.mergeSortInOrder(data, 0, center, data.length - 1);
         long endTime = System.currentTimeMillis();
-//        System.out.println("Duel MergeSort spend : " + (endTime - startTime) + "ms");
-//        sortSolution.verify(data);
         return (double) (endTime - startTime);
     }
 
@@ -125,8 +122,85 @@ public class ParallelSort {
         sortSolution.mergeSortInOrder(data, secondcenter + 1, thirdcenter, data.length - 1);
         sortSolution.mergeSortInOrder(data, 0, secondcenter, data.length - 1);
         long endTime = System.currentTimeMillis();
-//        System.out.println("Four MergeSort spend : " + (endTime - startTime) + "ms");
-//        sortSolution.verify(data);
+        return (double) (endTime - startTime);
+    }
+
+    public static double eightThreadMergeSort(int[] data) throws InterruptedException {
+        long startTime = System.currentTimeMillis();
+        SortSolution sortSolution = new SortSolution();
+        int fourth = data.length >> 1;
+        int second = (0 + fourth) >> 1;
+        int first = (0 + second) >> 1;
+        int third = (second + fourth) >> 1;
+        int sixth = (fourth + data.length) >> 1;
+        int fifth = (fourth + sixth) >> 1;
+        int seven = (sixth + data.length) >> 1;
+        CountDownLatch latch = new CountDownLatch(4);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                sortSolution.MergeSort(data, 0, first);
+                latch.countDown();
+            }
+        }).start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                sortSolution.MergeSort(data, first + 1, second);
+                latch.countDown();
+            }
+        }).start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                sortSolution.MergeSort(data, second + 1, third);
+                latch.countDown();
+            }
+        }).start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                sortSolution.MergeSort(data, third + 1, fourth);
+                latch.countDown();
+            }
+        }).start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                sortSolution.MergeSort(data, fourth + 1, fifth);
+                latch.countDown();
+            }
+        }).start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                sortSolution.MergeSort(data, fifth + 1, sixth);
+                latch.countDown();
+            }
+        }).start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                sortSolution.MergeSort(data, sixth + 1, seven);
+                latch.countDown();
+            }
+        }).start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                sortSolution.MergeSort(data, seven + 1, data.length - 1);
+                latch.countDown();
+            }
+        }).start();
+        latch.await();
+        sortSolution.mergeSortInOrder(data, 0, first, second);
+        sortSolution.mergeSortInOrder(data, second + 1, third, fourth);
+        sortSolution.mergeSortInOrder(data, fourth + 1, fifth, sixth);
+        sortSolution.mergeSortInOrder(data, sixth + 1, seven, data.length - 1);
+        sortSolution.mergeSortInOrder(data, 0, second, fourth);
+        sortSolution.mergeSortInOrder(data, fourth + 1, sixth, data.length - 1);
+        sortSolution.mergeSortInOrder(data, 0, fourth, data.length - 1);
+        long endTime = System.currentTimeMillis();
         return (double) (endTime - startTime);
     }
 
@@ -154,8 +228,6 @@ public class ParallelSort {
 
         sortSolution.mergeSortInOrder(data, 0, center, data.length - 1);
         long endTime = System.currentTimeMillis();
-//        System.out.println("Duel QuickSort spend : " + (endTime - startTime) + "ms");
-//        sortSolution.verify(data);
         return (double) (endTime - startTime);
     }
 
@@ -182,8 +254,6 @@ public class ParallelSort {
 
         sortSolution.mergeSortInOrder(data, 0, center, data.length - 1);
         long endTime = System.currentTimeMillis();
-//        System.out.println("Duel CountingSort spend : " + (endTime - startTime) + "ms");
-//        sortSolution.verify(data);
         return (double) (endTime - startTime);
     }
 
@@ -194,7 +264,6 @@ public class ParallelSort {
         forkJoinPool.execute(task);//执行任务
         forkJoinPool.awaitTermination(20, TimeUnit.MILLISECONDS);//阻塞当前线程直到pool中的任务都完成了
         long endTime = System.currentTimeMillis(); //quickSort over
-//        System.out.println("MergeSort spend : " + (endTime - startTime) + "ms");
         return (double) (endTime - startTime);
     }
 

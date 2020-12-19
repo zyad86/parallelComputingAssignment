@@ -24,22 +24,15 @@ public class SerialSort {
             long quickSortStartTime = System.currentTimeMillis();
             sortSolution.QuickSort(quickSortData, 0, quickSortData.length - 1, quickSortData.length);
             long quickSortEndTime = System.currentTimeMillis(); //quickSort over
-//            System.out.println("QuickSort spend : " + (quickSortEndTime - quickSortStartTime) + "ms");
             quickSortRunTime[i] = (double) (quickSortEndTime - quickSortStartTime);
             long countingSortStartTime = System.currentTimeMillis();
             sortSolution.CountingSort(countingSortData, 0, countingSortData.length - 1);
             long countingSortEndTime = System.currentTimeMillis(); //quickSort over
-//            System.out.println("CountSort spend : " + (countingSortEndTime - countingSortStartTime) + "ms");
             coutingSortRunTime[i] = (double) (countingSortEndTime - countingSortStartTime);
             long mergeSortStartTime = System.currentTimeMillis();
             sortSolution.MergeSort(mergeSortData, 0, mergeSortData.length - 1);
             long mergeSortEndTime = System.currentTimeMillis(); //quickSort over
-//            System.out.println("MergeSort spend : " + (mergeSortEndTime - mergeSortStartTime) + "ms");
             mergeSortRunTime[i] = (double) (mergeSortEndTime - mergeSortStartTime);
-            //verify!
-//            sortSolution.verify(quickSortData);
-//            sortSolution.verify(countingSortData);
-//            sortSolution.verify(mergeSortData);
         }
         calculateMeanAndStd(quickSortRunTime, coutingSortRunTime, mergeSortRunTime);
         SortSolution sortSolution = new SortSolution();
@@ -78,7 +71,6 @@ class FileLoader {
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
             String line;
             while ((line = br.readLine()) != null) {
-//                System.out.println(line);
                 if (line.trim().length() == 0) {
                     return new int[0];
                 }
