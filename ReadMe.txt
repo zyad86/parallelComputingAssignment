@@ -4,3 +4,4 @@
 2.在IDE中配置好JDK后可直接运行，运行时请注意，请将random.txt 与可执行文件放在同一目录下。
 3.如果没有IDE，直接javac ParallelSort.java 后运行 java ParallelSort即可，运行时请注意，请将random.txt 与可执行文件放在同一目录下。
 SerialSort.java 同理
+4.实验预设运行100次求均值和标准差，运行次数可调整公共变量
